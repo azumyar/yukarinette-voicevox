@@ -1,0 +1,164 @@
+<Window
+    x:Class="Yarukizero.Net.Yularinette.VoiceVox.Views.SettingWindow"
+    x:Name="_this"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:system="clr-namespace:System;assembly=mscorlib"
+    xmlns:local="clr-namespace:Yarukizero.Net.Yularinette.VoiceVox.Views"
+    mc:Ignorable="d"
+    Width="360"
+    Height="450"
+    d:DesignHeight="450" d:DesignWidth="360"
+    FontFamily="Yu Gothic UI,Meiryo UI"
+    Title="VOICEVOX設定">
+    <Window.Resources>
+    </Window.Resources>
+
+    <Window.Content>
+        <Border>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Margin="4">
+                    <Button
+                        Padding="8,4,8,4"
+                        HorizontalAlignment="Left"
+                        Content="再読み込み"
+                        Click="ButtonClickReload"
+                        />
+                </Border>
+
+                <Border Grid.Row="1" Margin="4,0,4,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200" />
+                            <ColumnDefinition Width="4" />
+                            <ColumnDefinition Width="128" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="32" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="32" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="32" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="32" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <ListBox
+                            Grid.Column="0" Grid.Row="0" Grid.RowSpan="9"
+                            ItemsSource="{Binding Source, Mode=OneWay, ElementName=_this}"
+                            SelectedIndex="{Binding SourceIndex, Mode=TwoWay, ElementName=_this}"
+                            >
+                            
+                        </ListBox>
+                        
+                        <TextBlock
+                            Grid.Column="2" Grid.Row="0"
+                            VerticalAlignment="Center"
+                            Text="{Binding SpeedScaleName, Mode=OneWay, ElementName=_this}"
+                            />
+                        <Slider
+                            Grid.Column="2" Grid.Row="1"
+                            VerticalAlignment="Center"
+                            Value="{Binding SpeedScaleValue, Mode=TwoWay, ElementName=_this}"
+                            Maximum="2.0"
+                            Minimum="0.5"
+                            TickPlacement="None"
+                            TickFrequency="0.01"
+                            SmallChange="0.01"
+                            LargeChange="0.05"
+                            />
+
+                        <TextBlock
+                            Grid.Column="2" Grid.Row="2"
+                            VerticalAlignment="Center"
+                            Text="{Binding PitchScaleName, Mode=OneWay, ElementName=_this}"
+                            />
+                        <Slider
+                            Grid.Column="2" Grid.Row="3"
+                            VerticalAlignment="Center"
+                            Value="{Binding PitchScaleValue, Mode=TwoWay, ElementName=_this}"
+                            Maximum="0.15"
+                            Minimum="-0.15"
+                            TickPlacement="None"
+                            TickFrequency="0.01"
+                            SmallChange="0.01"
+                            LargeChange="0.05"
+                            />
+
+                        <TextBlock
+                            Grid.Column="2" Grid.Row="4"
+                            VerticalAlignment="Center"
+                            Text="{Binding IntonationScaleName, Mode=OneWay, ElementName=_this}"
+                            />
+                        <Slider
+                            Grid.Column="2" Grid.Row="5"
+                            VerticalAlignment="Center"
+                            Value="{Binding IntonationScaleValue, Mode=TwoWay, ElementName=_this}"
+                            Maximum="2"
+                            Minimum="0"
+                            TickPlacement="None"
+                            TickFrequency="0.01"
+                            SmallChange="0.01"
+                            LargeChange="0.05"
+                            />
+
+                        <TextBlock
+                            Grid.Column="2" Grid.Row="6"
+                            VerticalAlignment="Center"
+                            Text="{Binding VolumeScaleName, Mode=OneWay, ElementName=_this}"
+                            />
+                        <Slider
+                            Grid.Column="2" Grid.Row="7"
+                            VerticalAlignment="Center"
+                            Value="{Binding VolumeScaleValue, Mode=TwoWay, ElementName=_this}"
+                            Maximum="2"
+                            Minimum="0"
+                            TickPlacement="None"
+                            TickFrequency="0.01"
+                            SmallChange="0.01"
+                            LargeChange="0.05"
+                            />
+                    </Grid>
+                </Border>
+                
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button
+                        Grid.Column="1"
+                        Margin="4,4,0,4"
+                        Padding="8,4,8,4"
+                        Width="72"
+                        Content="保存"
+                        Click="ButtonClickSave"
+                        />
+                    <Button
+                        Grid.Column="2"
+                        Margin="4"
+                        Padding="8,4,8,4"
+                        Width="72"
+                        Content="キャンセル"
+                        Click="ButtonClickCancel"
+                        />
+                </Grid>
+            </Grid>
+        </Border>
+    </Window.Content>
+
+
+    
+</Window>

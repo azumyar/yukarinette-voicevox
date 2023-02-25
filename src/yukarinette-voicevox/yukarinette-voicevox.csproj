@@ -5,6 +5,7 @@
     <RootNamespace>Yarukizero.Net.Yularinette.VoiceVox</RootNamespace>
     <LangVersion>10</LangVersion>
     <VersionPrefix>0.1.0</VersionPrefix>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">

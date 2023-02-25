@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -15,9 +16,10 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Xml.Linq;
 using Yarukizero.Net.Yularinette.VoiceVox.Data;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Yarukizero.Net.Yularinette.VoiceVox {
-	internal class Connect : IDisposable {
+	public class Connect : IDisposable {
 		private static readonly HttpClient httpClient = new HttpClient();
 
 		public Connect() {
@@ -26,20 +28,40 @@ namespace Yarukizero.Net.Yularinette.VoiceVox {
 		public void Dispose() {
 		}
 
-		public void Speech(string text) {
-			int voiceVoxPort = 50021;
-			int speakerId = 3;
+		public async Task<IEnumerable<Data.Speaker>> GetSpeaker(string host, int port) {
+			try {
+				var entry = $@"http://{host}:{port}";
+				using var request = new HttpRequestMessage(
+					HttpMethod.Get,
+					new Uri($"{entry}/speakers"));
+				using var response = await httpClient.SendAsync(request);
+				if(response.StatusCode != HttpStatusCode.OK) {
+					throw new Yukarinette.YukarinetteException();
+				}
 
+				return JsonConvert.DeserializeObject<Data.Speaker[]>(await response.Content.ReadAsStringAsync());
+			}
+			catch(HttpRequestException) { // VOICEVOXと通信できないので空を返す
+				return Enumerable.Empty<Data.Speaker>();
+			}
+			catch(Yukarinette.YukarinetteException) {
+				throw;
+			}
+			catch(Exception e) {
+				throw new Yukarinette.YukarinetteException(e);
+			}
+		}
 
+		public void Speech(string text, Data.SettingObject setting) {
 			WasapiOut wavPlayer = null;
 			MMDevice mmDevice = null;
 			try {
-				var entry = $@"http://{"127.0.0.1"}:{voiceVoxPort}";
+				var entry = $@"http://{setting.Host}:{setting.Port}";
 				AudioQuery json;
 				{
 					using var request = new HttpRequestMessage(
 						HttpMethod.Post,
-						new Uri($"{entry}/audio_query?text={HttpUtility.UrlEncode(text)}&speaker={speakerId}"));
+						new Uri($"{entry}/audio_query?text={HttpUtility.UrlEncode(text)}&speaker={setting.Id}"));
 					using var response = httpClient.SendAsync(request);
 					response.Wait();
 					if(response.Result.StatusCode != HttpStatusCode.OK) {
@@ -51,13 +73,17 @@ namespace Yarukizero.Net.Yularinette.VoiceVox {
 					json = JsonConvert.DeserializeObject<AudioQuery>(@string.Result);
 				}
 
+				json.SpeedScale = setting.SpeedScale;
+				json.PitchScale = setting.PitchScale;
+				json.IntonationScale = setting.IntonationScale;
+				json.VolumeScale = setting.VolumeScale;
 				json.OutputSamplingRate = 48000;
 				json.OutputStereo = false;
 
 				{
 					using var request = new HttpRequestMessage(
 						HttpMethod.Post,
-						new Uri($"{entry}/synthesis?speaker={speakerId}&enable_interrogative_upspeak={true}")) {
+						new Uri($"{entry}/synthesis?speaker={setting.Id}&enable_interrogative_upspeak={true}")) {
 
 						Content = new StringContent(json.ToString(), Encoding.UTF8, @"application/json"),
 					};
