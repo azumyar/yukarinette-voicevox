@@ -1,3 +1,4 @@
+using NAudio.CoreAudioApi;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -33,7 +34,19 @@ namespace Yarukizero.Net.Yularinette.VoiceVox.Views {
 				typeof(int),
 				typeof(SettingWindow),
 				new PropertyMetadata(0));
-
+		public static readonly DependencyProperty SoundDeviciesProperty
+			= DependencyProperty.Register(
+				nameof(SoundDevicies),
+				typeof(IEnumerable<Data.SoundDevice>),
+				typeof(SettingWindow),
+				new PropertyMetadata(Enumerable.Empty<Data.SoundDevice>()));
+		public static readonly DependencyProperty SoundDeviceProperty
+			= DependencyProperty.Register(
+				nameof(SoundDevice),
+				typeof(Data.SoundDevice),
+				typeof(SettingWindow),
+				new PropertyMetadata(default(Data.SoundDevice)));
+		
 		public static readonly DependencyProperty SpeedScaleNameProperty
 			= DependencyProperty.Register(
 				nameof(SpeedScaleName),
@@ -93,6 +106,16 @@ namespace Yarukizero.Net.Yularinette.VoiceVox.Views {
 			get => (int)this.GetValue(SourceIndexProperty);
 			set { this.SetValue(SourceIndexProperty, value); }
 		}
+		public IEnumerable<Data.SoundDevice> SoundDevicies {
+			get => (IEnumerable<Data.SoundDevice>)this.GetValue(SoundDeviciesProperty);
+			set { this.SetValue(SoundDeviciesProperty, value); }
+		}
+		public Data.SoundDevice SoundDevice {
+			get => (Data.SoundDevice)this.GetValue(SoundDeviceProperty);
+			set { this.SetValue(SoundDeviceProperty, value); }
+		}
+
+		
 
 		public string SpeedScaleName {
 			get => (string)this.GetValue(SpeedScaleNameProperty);
@@ -135,6 +158,16 @@ namespace Yarukizero.Net.Yularinette.VoiceVox.Views {
 			InitializeComponent();
 
 			this.Loaded += async (_, _) => {
+				using var de = new MMDeviceEnumerator();
+				this.SoundDevicies = new[] { new Data.SoundDevice() {
+					Name = "システムデフォルト",
+				}}.Concat(de.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)
+					.Select(x => new Data.SoundDevice() {
+						Name = $"{x.FriendlyName}({x.DeviceFriendlyName})",
+						Id = x.ID,
+					}));
+				this.SoundDevice = this.SoundDevicies.First();
+
 				// 初期値を入れる
 				this.SpeedScaleValue = 1d;
 				this.PitchScaleValue = 0d;

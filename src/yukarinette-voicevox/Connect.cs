@@ -96,7 +96,16 @@ namespace Yarukizero.Net.Yularinette.VoiceVox {
 					var bufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(48000, 16, 1)) {
 						BufferLength = 76800 * 10,
 					};
-					mmDevice = new MMDeviceEnumerator().GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+					using var de = new MMDeviceEnumerator();
+					if(!string.IsNullOrEmpty(setting.OutputDeviceId)) {
+						try {
+							mmDevice = de.GetDevice(setting.OutputDeviceId);
+						}
+						catch { }
+					}
+					if(mmDevice == null) {
+						mmDevice = de.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+					}
 					wavPlayer = new WasapiOut(mmDevice, AudioClientShareMode.Shared, false, 200);
 					wavPlayer.Init(new VolumeWaveProvider16(bufferedWaveProvider));
 					var t = Task.Run(async () => {

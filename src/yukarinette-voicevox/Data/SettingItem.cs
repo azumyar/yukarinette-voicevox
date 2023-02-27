@@ -14,6 +14,13 @@ namespace Yarukizero.Net.Yularinette.VoiceVox.Data {
 		public override string ToString() => this.Name;
 	}
 
+	public class SoundDevice {
+		public string Name { get; set; }
+		public string Id { get; set; }
+
+		public override string ToString() => this.Name;
+	}
+
 
 	public class SettingObject : ConfigObject {
 		[JsonProperty("id", Required = Required.Always)]
@@ -38,6 +45,9 @@ namespace Yarukizero.Net.Yularinette.VoiceVox.Data {
 
 		[JsonProperty("port", Required = Required.Always)]
 		public int Port { get; set; }
+
+		[JsonProperty("output-device")] // 2023/2/28追加,null可
+		public string? OutputDeviceId { get; set; }
 
 
 		public SettingObject() {

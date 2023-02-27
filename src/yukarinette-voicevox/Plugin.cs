@@ -59,6 +59,7 @@ namespace Yarukizero.Net.Yularinette.VoiceVox {
 					PitchScale = s.PitchScaleValue,
 					IntonationScale = s.IntonationScaleValue,
 					VolumeScale = s.VolumeScaleValue,
+					OutputDeviceId = s.SoundDevice.Id,
 				};
 				File.WriteAllText(this.configPath, this.setting.ToString());
 			}
