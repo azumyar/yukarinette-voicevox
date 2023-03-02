@@ -94,7 +94,7 @@ namespace Yarukizero.Net.Yularinette.VoiceVox {
 					}
 
 					var bufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(48000, 16, 1)) {
-						BufferLength = 76800 * 10,
+						BufferDuration = TimeSpan.FromSeconds(10),
 					};
 					using var de = new MMDeviceEnumerator();
 					if(!string.IsNullOrEmpty(setting.OutputDeviceId)) {
@@ -111,27 +111,22 @@ namespace Yarukizero.Net.Yularinette.VoiceVox {
 					var t = Task.Run(async () => {
 						using var s = await response.Result.Content.ReadAsStreamAsync();
 						try {
-							byte[] b = new byte[76800]; // 1秒間のデータサイズ
+							byte[] b = new byte[76800];
 							var pos = 0;
 							var ret = 0;
-							var sw = new Stopwatch();
-							sw.Start();
 							while(0 < (ret = s.Read(b, 0, b.Length))) {
 								bufferedWaveProvider.AddSamples(b, 0, ret);
 								pos += ret;
 
-								sw.Stop();
-								while((sw.ElapsedMilliseconds + 5000) < (pos / 76800d * 1000)) {
-									sw.Start();
-									Thread.Sleep(1);
-									sw.Stop();
-								};
+								while((bufferedWaveProvider.WaveFormat.AverageBytesPerSecond * 5)
+									< bufferedWaveProvider.BufferedBytes) {
+
+									Thread.Sleep(10);
+								}
 							}
-							do {
-								sw.Start();
+							while(0 < bufferedWaveProvider.BufferedBytes) {
 								Thread.Sleep(1);
-								sw.Stop();
-							} while(sw.ElapsedMilliseconds < (pos / 76800d * 1000));
+							}
 						}
 						catch(Exception e) {
 							throw new Yukarinette.YukarinetteException(e);
