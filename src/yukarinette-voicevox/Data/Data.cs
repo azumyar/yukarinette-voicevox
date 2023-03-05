@@ -16,5 +16,7 @@ namespace Yarukizero.Net.Yularinette.VoiceVox.Data {
 	public class ConfigObject : JsonObject {
 		[JsonProperty("version", Required = Required.Always)]
 		public int Version { get; protected set; }
+
+		public sealed override string ToString() => base.ToString();
 	}
 }

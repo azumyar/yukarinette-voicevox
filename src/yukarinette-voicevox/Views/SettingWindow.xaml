@@ -9,8 +9,10 @@
     xmlns:local="clr-namespace:Yarukizero.Net.Yularinette.VoiceVox.Views"
     mc:Ignorable="d"
     Width="360"
-    Height="450"
-    d:DesignHeight="450" d:DesignWidth="360"
+    Height="520"
+    MinWidth="360"
+    MinHeight="520"
+    d:DesignHeight="520" d:DesignWidth="360"
     FontFamily="Yu Gothic UI,Meiryo UI"
     Title="VOICEVOX設定">
     <Window.Resources>
@@ -30,126 +32,133 @@
                     <Button
                         Padding="8,4,8,4"
                         HorizontalAlignment="Left"
-                        Content="再読み込み"
+                        Content="VOICEVOX再読み込み"
                         Click="ButtonClickReload"
                         />
                 </Border>
 
-                <Border Grid.Row="1" Margin="4,0,4,0">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="200" />
-                            <ColumnDefinition Width="4" />
-                            <ColumnDefinition Width="128" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="32" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="32" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="32" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="32" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+                <TabControl Grid.Row="1">
+                    <TabItem Header="基本設定">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <local:VoiceVoxPanel
+                                Grid.Row="0"
+                                HorizontalAlignment="Left"
+                                Width="128"
+                                Source="{Binding PrimarySetting.Value, Mode=OneWay}"
+                                />
 
-                        <ListBox
-                            Grid.Column="0" Grid.Row="0" Grid.RowSpan="9"
-                            ItemsSource="{Binding Source, Mode=OneWay, ElementName=_this}"
-                            SelectedIndex="{Binding SourceIndex, Mode=TwoWay, ElementName=_this}"
-                            >
-                            
-                        </ListBox>
-                        
-                        <TextBlock
-                            Grid.Column="2" Grid.Row="0"
-                            VerticalAlignment="Center"
-                            Text="{Binding SpeedScaleName, Mode=OneWay, ElementName=_this}"
-                            />
-                        <Slider
-                            Grid.Column="2" Grid.Row="1"
-                            VerticalAlignment="Center"
-                            Value="{Binding SpeedScaleValue, Mode=TwoWay, ElementName=_this}"
-                            Maximum="2.0"
-                            Minimum="0.5"
-                            TickPlacement="None"
-                            TickFrequency="0.01"
-                            SmallChange="0.01"
-                            LargeChange="0.05"
-                            />
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="128" />
+                                    <ColumnDefinition Width="4" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Padding="4"
+                                    VerticalAlignment="Center"
+                                    Text="出力サウンド"                        
+                                    />
+                                <ComboBox
+                                    Grid.Column="2"
+                                    ItemsSource="{Binding SoundDevices.Value, Mode=OneWay}"
+                                    SelectedItem="{Binding SelectedSoundDevice.Value, Mode=TwoWay}"
+                                    />
+                            </Grid>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="拡張設定">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="128" />
+                                <ColumnDefinition Width="4" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <CheckBox
+                                Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0"
+                                Content="配信パネルを有効にする"
+                                Margin="4"
+                                IsChecked="{Binding EnableControlPanel.Value, Mode=TwoWay}"
+                                />
+                            <local:HotKeyPanel
+                                Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1"
+                                Width="240"
+                                HorizontalAlignment="Left"
+                                Text="基本設定ホットキー"
+                                KeyGesture="{Binding PrimarySettingHotKey.Value, Mode=TwoWay}"
+                                />
 
-                        <TextBlock
-                            Grid.Column="2" Grid.Row="2"
-                            VerticalAlignment="Center"
-                            Text="{Binding PitchScaleName, Mode=OneWay, ElementName=_this}"
-                            />
-                        <Slider
-                            Grid.Column="2" Grid.Row="3"
-                            VerticalAlignment="Center"
-                            Value="{Binding PitchScaleValue, Mode=TwoWay, ElementName=_this}"
-                            Maximum="0.15"
-                            Minimum="-0.15"
-                            TickPlacement="None"
-                            TickFrequency="0.01"
-                            SmallChange="0.01"
-                            LargeChange="0.05"
-                            />
+                            <ListBox
+                                Grid.Column="0" Grid.Row="2" Grid.RowSpan="4"
+                                ItemsSource="{Binding SecondarySettings, Mode=OneWay}"
+                                SelectedItem="{Binding SecondarySettingsSelectItem.Value, Mode=TwoWay}"
+                                />
 
-                        <TextBlock
-                            Grid.Column="2" Grid.Row="4"
-                            VerticalAlignment="Center"
-                            Text="{Binding IntonationScaleName, Mode=OneWay, ElementName=_this}"
-                            />
-                        <Slider
-                            Grid.Column="2" Grid.Row="5"
-                            VerticalAlignment="Center"
-                            Value="{Binding IntonationScaleValue, Mode=TwoWay, ElementName=_this}"
-                            Maximum="2"
-                            Minimum="0"
-                            TickPlacement="None"
-                            TickFrequency="0.01"
-                            SmallChange="0.01"
-                            LargeChange="0.05"
-                            />
+                            <local:VoiceVoxPanel
+                                Grid.Column="2" Grid.Row="2"
+                                HorizontalAlignment="Left"
+                                Width="128"
+                                Source="{Binding SecondarySettingWorkPanel.Value, Mode=OneWay}"
+                                />
 
-                        <TextBlock
-                            Grid.Column="2" Grid.Row="6"
-                            VerticalAlignment="Center"
-                            Text="{Binding VolumeScaleName, Mode=OneWay, ElementName=_this}"
-                            />
-                        <Slider
-                            Grid.Column="2" Grid.Row="7"
-                            VerticalAlignment="Center"
-                            Value="{Binding VolumeScaleValue, Mode=TwoWay, ElementName=_this}"
-                            Maximum="2"
-                            Minimum="0"
-                            TickPlacement="None"
-                            TickFrequency="0.01"
-                            SmallChange="0.01"
-                            LargeChange="0.05"
-                            />
-                    </Grid>
-                </Border>
+                            <local:HotKeyPanel
+                                Grid.Column="2" Grid.Row="3"
+                                Margin="0,4,0,0"
+                                Width="200"
+                                HorizontalAlignment="Left"
+                                KeyGesture="{Binding SecondarySettingWorkHotKey.Value, Mode=TwoWay}"
+                                />
 
-                <Grid Grid.Row="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="128" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock
-                        Grid.Column="1"
-                        Padding="4"
-                        VerticalAlignment="Center"
-                        Text="出力サウンド"                        
-                        />
-                    <ComboBox
-                        Grid.Column="2"
-                        ItemsSource="{Binding SoundDevicies, Mode=OneWay, ElementName=_this}"
-                        SelectedItem="{Binding SoundDevice, Mode=TwoWay, ElementName=_this}"
-                        />
-                </Grid>
+                            <Grid Grid.Column="2" Grid.Row="4" VerticalAlignment="Top">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="32" />
+                                    <ColumnDefinition Width="128" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    Text="名前"
+                                    />
+                                <TextBox
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding SecondarySettingWorkName.Value, Mode=TwoWay}"
+                                    />
+                                <Button
+                                    Grid.Column="3"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    Margin="4"
+                                    Padding="8,4,8,4"
+                                    Content="追加"
+                                    Click="ButtonClickAddSecondary"
+                                    />
+                            </Grid>
+
+                            <Button
+                                Grid.Column="0" Grid.Row="5"
+                                Padding="8,4,8,4"
+                                Content="選択削除"
+                                Click="ButtonClickDeleteSecondary"
+                                />
+                        </Grid>
+                    </TabItem>
+                </TabControl>
 
                 <Grid Grid.Row="3">
                     <Grid.ColumnDefinitions>

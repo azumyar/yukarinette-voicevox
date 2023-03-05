@@ -4,7 +4,7 @@
     <TargetFramework>net48</TargetFramework>
     <RootNamespace>Yarukizero.Net.Yularinette.VoiceVox</RootNamespace>
     <LangVersion>10</LangVersion>
-    <VersionPrefix>0.3.0</VersionPrefix>
+    <VersionPrefix>0.4.0</VersionPrefix>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
@@ -29,5 +29,6 @@
     </Reference>
 	<PackageReference Include="NAudio" Version="2.1.0" />
 	<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+	<PackageReference Include="ReactiveProperty" Version="9.0.0" />
   </ItemGroup>
 </Project>

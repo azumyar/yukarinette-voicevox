@@ -1,0 +1,103 @@
+<UserControl
+    x:Class="Yarukizero.Net.Yularinette.VoiceVox.Views.VoiceVoxPanel"
+    x:Name="_this"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:system="clr-namespace:System;assembly=mscorlib"
+    xmlns:local="clr-namespace:Yarukizero.Net.Yularinette.VoiceVox.Views"
+    mc:Ignorable="d"
+    d:DesignHeight="450" d:DesignWidth="360"
+    FontFamily="Yu Gothic UI,Meiryo UI">
+    <Border>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="32" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="32" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="32" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="32" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <ComboBox
+                Grid.Row="0"
+                ItemsSource="{Binding Source.Speakers, Mode=OneWay, ElementName=_this}"
+                SelectedItem="{Binding Source.SelectedSpeakers, Mode=TwoWay, ElementName=_this}"
+                />
+
+            <TextBlock
+                Grid.Row="1"
+                VerticalAlignment="Center"
+                Text="{Binding Source.Setting.SpeedScale, StringFormat=話速{0:F2}, Mode=OneWay, ElementName=_this}"
+                />
+            <Slider
+                Grid.Row="2"
+                VerticalAlignment="Center"
+                Value="{Binding Source.Setting.SpeedScale, Mode=TwoWay, ElementName=_this}"
+                Maximum="2.0"
+                Minimum="0.5"
+                TickPlacement="None"
+                TickFrequency="0.01"
+                SmallChange="0.01"
+                LargeChange="0.05"
+                />
+
+            <TextBlock
+                Grid.Row="3"
+                VerticalAlignment="Center"
+                Text="{Binding Source.Setting.PitchScale, StringFormat=音高{0:F2}, Mode=OneWay, ElementName=_this}"
+                />
+            <Slider
+                Grid.Row="4"
+                VerticalAlignment="Center"
+                Value="{Binding Source.Setting.PitchScale, Mode=TwoWay, ElementName=_this}"
+                Maximum="0.15"
+                Minimum="-0.15"
+                TickPlacement="None"
+                TickFrequency="0.01"
+                SmallChange="0.01"
+                LargeChange="0.05"
+                />
+
+            <TextBlock
+                Grid.Row="5"
+                VerticalAlignment="Center"
+                Text="{Binding Source.Setting.IntonationScale, StringFormat=抑揚{0:F2}, Mode=OneWay, ElementName=_this}"
+                />
+            <Slider
+                Grid.Row="6"
+                VerticalAlignment="Center"
+                Value="{Binding Source.Setting.IntonationScale, Mode=TwoWay, ElementName=_this}"
+                Maximum="2"
+                Minimum="0"
+                TickPlacement="None"
+                TickFrequency="0.01"
+                SmallChange="0.01"
+                LargeChange="0.05"
+                />
+
+            <TextBlock
+                Grid.Row="7"
+                VerticalAlignment="Center"
+                Text="{Binding Source.Setting.VolumeScale, StringFormat=音量{0:F2}, Mode=OneWay, ElementName=_this}"
+                />
+            <Slider
+                Grid.Row="8"
+                VerticalAlignment="Center"
+                Value="{Binding Source.Setting.VolumeScale, Mode=TwoWay, ElementName=_this}"
+                Maximum="2"
+                Minimum="0"
+                TickPlacement="None"
+                TickFrequency="0.01"
+                SmallChange="0.01"
+                LargeChange="0.05"
+                />
+        </Grid>
+    </Border>
+</UserControl>

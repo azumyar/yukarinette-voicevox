@@ -28,12 +28,11 @@ namespace Yarukizero.Net.Yularinette.VoiceVox {
 		public void Dispose() {
 		}
 
-		public async Task<IEnumerable<Data.Speaker>> GetSpeaker(string host, int port) {
+		public async Task<IEnumerable<Data.Speaker>> GetSpeaker(string endPoint) {
 			try {
-				var entry = $@"http://{host}:{port}";
 				using var request = new HttpRequestMessage(
 					HttpMethod.Get,
-					new Uri($"{entry}/speakers"));
+					new Uri($"{endPoint}/speakers"));
 				using var response = await httpClient.SendAsync(request);
 				if(response.StatusCode != HttpStatusCode.OK) {
 					throw new Yukarinette.YukarinetteException();
@@ -52,16 +51,15 @@ namespace Yarukizero.Net.Yularinette.VoiceVox {
 			}
 		}
 
-		public void Speech(string text, Data.SettingObject setting) {
+		public void Speech(string text, string endPoint, string outputDeviceId, Data.VoiceVoxSetting setting) {
 			WasapiOut wavPlayer = null;
 			MMDevice mmDevice = null;
 			try {
-				var entry = $@"http://{setting.Host}:{setting.Port}";
 				AudioQuery json;
 				{
 					using var request = new HttpRequestMessage(
 						HttpMethod.Post,
-						new Uri($"{entry}/audio_query?text={HttpUtility.UrlEncode(text)}&speaker={setting.Id}"));
+						new Uri($"{endPoint}/audio_query?text={HttpUtility.UrlEncode(text)}&speaker={setting.Id}"));
 					using var response = httpClient.SendAsync(request);
 					response.Wait();
 					if(response.Result.StatusCode != HttpStatusCode.OK) {
@@ -83,7 +81,7 @@ namespace Yarukizero.Net.Yularinette.VoiceVox {
 				{
 					using var request = new HttpRequestMessage(
 						HttpMethod.Post,
-						new Uri($"{entry}/synthesis?speaker={setting.Id}&enable_interrogative_upspeak={true}")) {
+						new Uri($"{endPoint}/synthesis?speaker={setting.Id}&enable_interrogative_upspeak={true}")) {
 
 						Content = new StringContent(json.ToString(), Encoding.UTF8, @"application/json"),
 					};
@@ -97,9 +95,9 @@ namespace Yarukizero.Net.Yularinette.VoiceVox {
 						BufferDuration = TimeSpan.FromSeconds(10),
 					};
 					using var de = new MMDeviceEnumerator();
-					if(!string.IsNullOrEmpty(setting.OutputDeviceId)) {
+					if(!string.IsNullOrEmpty(outputDeviceId)) {
 						try {
-							mmDevice = de.GetDevice(setting.OutputDeviceId);
+							mmDevice = de.GetDevice(outputDeviceId);
 						}
 						catch { }
 					}
