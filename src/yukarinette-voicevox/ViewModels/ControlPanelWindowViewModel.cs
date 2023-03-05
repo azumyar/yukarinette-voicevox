@@ -9,11 +9,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
-using Yarukizero.Net.Yularinette.VoiceVox.Data;
-using Yarukizero.Net.Yularinette.VoiceVox.Views;
 
 namespace Yarukizero.Net.Yularinette.VoiceVox.ViewModels {
 	public class ControlPanelWindowViewModel {
+		// グローバルフックはGC?で壊れるので今は使っていない
 		static class KeyHook {
 			[StructLayout(LayoutKind.Sequential)]
 			private class KBDLLHOOKSTRUCT {
@@ -23,9 +22,13 @@ namespace Yarukizero.Net.Yularinette.VoiceVox.ViewModels {
 				public int time;
 				public IntPtr dwExtraInfo;
 			}
+			[UnmanagedFunctionPointer(CallingConvention.StdCall)] 
 			private delegate int KeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 			[DllImport("user32.dll")]
 			private static extern IntPtr SetWindowsHookEx(int idHook, KeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
+			[DllImport("user32.dll")]
+			private static extern IntPtr SetWindowsHookEx(int idHook, IntPtr lpfn, IntPtr hMod, uint dwThreadId);
+
 			[DllImport("user32.dll")]
 			[return: MarshalAs(UnmanagedType.Bool)]
 			private static extern bool UnhookWindowsHookEx(IntPtr hhk);
@@ -44,18 +47,22 @@ namespace Yarukizero.Net.Yularinette.VoiceVox.ViewModels {
 			private const int KEYEVENTF_SCANCODE = 0x0008;
 			private const int KEYEVENTF_UNICODE = 0x0004;
 
-			public static Action<int> Callback { get; set; }
+			public delegate void HookCallBack(int vk);
+
+			public static HookCallBack Callback;
 
 			private static IntPtr hHook = IntPtr.Zero;
 			private static KeyboardProc proc;
+			private static IntPtr pProc;
 
 			public static void StartHook() {
 				proc = HookCallback;
+				//pProc = Marshal.GetFunctionPointerForDelegate(proc);
 				hHook = SetWindowsHookEx(
 					WH_KEYBOARD_LL,
 					proc,
-					Marshal.GetHINSTANCE(typeof(KeyHook).Module),
-					//GetModuleHandle(null),
+					//Marshal.GetHINSTANCE(typeof(KeyHook).Module),
+					GetModuleHandle(null),
 					0);
 			}
 
@@ -65,7 +72,8 @@ namespace Yarukizero.Net.Yularinette.VoiceVox.ViewModels {
 			}
 
 			private static int HookCallback(int nCode, IntPtr wParam, IntPtr lParam) {
-				if((0 <= nCode) && (wParam.ToInt32() == WM_KEYDOWN)) {
+				MessageBox.Show("hook"+nCode);
+				if((0 == nCode) && (wParam.ToInt32() == WM_KEYDOWN)) {
 					var kb = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
 					Callback?.Invoke(kb.vkCode);
 				}
@@ -106,54 +114,58 @@ namespace Yarukizero.Net.Yularinette.VoiceVox.ViewModels {
 		}
 
 		public void StartViewModel() {
-			KeyHook.Callback = (k) => {
-				var vk = k switch {
-					HotKeyPanel.VK_NUMPAD0 => HotKeyPanel.VK_0,
-					HotKeyPanel.VK_NUMPAD1 => HotKeyPanel.VK_1,
-					HotKeyPanel.VK_NUMPAD2 => HotKeyPanel.VK_2,
-					HotKeyPanel.VK_NUMPAD3 => HotKeyPanel.VK_3,
-					HotKeyPanel.VK_NUMPAD4 => HotKeyPanel.VK_4,
-					HotKeyPanel.VK_NUMPAD5 => HotKeyPanel.VK_5,
-					HotKeyPanel.VK_NUMPAD6 => HotKeyPanel.VK_6,
-					HotKeyPanel.VK_NUMPAD7 => HotKeyPanel.VK_7,
-					HotKeyPanel.VK_NUMPAD8 => HotKeyPanel.VK_8,
-					HotKeyPanel.VK_NUMPAD9 => HotKeyPanel.VK_9,
-					var v => v,
-				};
-
-				foreach(var it in this.SpeechPreset.Where(x => x.EnableHotkey && (x.Virtualkey == vk))) {
-					var m = (ModifierKeys)it.ModifiersKey;
-					var exec = true;
-					if((m & ModifierKeys.Control) == ModifierKeys.Control) {
-						exec |= Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
-					}
-					if((m & ModifierKeys.Shift) == ModifierKeys.Shift) {
-						exec |= Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
-					}
-					if((m & ModifierKeys.Alt) == ModifierKeys.Alt) {
-						exec |= Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt);
-					}
-					if((m & ModifierKeys.Windows) == ModifierKeys.Windows) {
-						exec |= Keyboard.IsKeyDown(Key.LWin) || Keyboard.IsKeyDown(Key.RWin);
-					}
-
-					if(exec) {
-						Observable.Return(it)
-							.ObserveOn(UIDispatcherScheduler.Default)
-							.Subscribe(x => {
-								this.CurrentPreset.Value = x;
-							});
-						break;
-					}
-				}
-			};
-			// 動かないのでいったん無効化
+			//KeyHook.Callback = HookProc;
 			//KeyHook.StartHook();
+		}
+
+		private void HookProc(int k) {
+			var vk = k switch {
+				Data.Key.VK_NUMPAD0 => Data.Key.VK_0,
+				Data.Key.VK_NUMPAD1 => Data.Key.VK_1,
+				Data.Key.VK_NUMPAD2 => Data.Key.VK_2,
+				Data.Key.VK_NUMPAD3 => Data.Key.VK_3,
+				Data.Key.VK_NUMPAD4 => Data.Key.VK_4,
+				Data.Key.VK_NUMPAD5 => Data.Key.VK_5,
+				Data.Key.VK_NUMPAD6 => Data.Key.VK_6,
+				Data.Key.VK_NUMPAD7 => Data.Key.VK_7,
+				Data.Key.VK_NUMPAD8 => Data.Key.VK_8,
+				Data.Key.VK_NUMPAD9 => Data.Key.VK_9,
+				var v => v,
+			};
+
+			foreach(var it in this.SpeechPreset.Where(x => x.EnableHotkey && (x.Virtualkey == vk))) {
+				var m = (ModifierKeys)it.ModifiersKey;
+				var exec = true;
+				if((m & ModifierKeys.Control) == ModifierKeys.Control) {
+					exec |= Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+				}
+				if((m & ModifierKeys.Shift) == ModifierKeys.Shift) {
+					exec |= Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
+				}
+				if((m & ModifierKeys.Alt) == ModifierKeys.Alt) {
+					exec |= Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt);
+				}
+				if((m & ModifierKeys.Windows) == ModifierKeys.Windows) {
+					exec |= Keyboard.IsKeyDown(Key.LWin) || Keyboard.IsKeyDown(Key.RWin);
+				}
+
+				if(exec) {
+					Observable.Return(it)
+						.ObserveOn(UIDispatcherScheduler.Default)
+						.Subscribe(x => {
+							this.CurrentPreset.Value = x;
+						});
+					break;
+				}
+			}
 		}
 
 		public void EndViewModel() {
 			//KeyHook.EndHook();
 		}
 
+		public void CallHotKey(int index) {
+			this.CurrentPreset.Value = this.SpeechPreset.ElementAtOrDefault(index);
+		}
 	}
 }
