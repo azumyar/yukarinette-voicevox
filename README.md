@@ -1,6 +1,5 @@
 # yukarinette-voicevox
-ゆかりねっととVOICEVOXの連携  
-https://install.appcenter.ms/users/azumyar/apps/yukarinette-voicevox/distribution_groups/release  
+ゆかりねっととVOICEVOXの連携
 
 ## インストール
 解凍したファイルをすべてゆかりねっとのPluginsフォルダにコピーしてください
